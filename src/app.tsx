@@ -42,7 +42,7 @@ export function App({ note }: ShareImageProps): JSXInternal.Element {
     const checkMobile = () => {
       const isMobileView = window.innerWidth <= 768;
       setIsMobile(isMobileView);
-      setContainerWidth(isMobileView ? "95%" : "50%");
+      setContainerWidth(isMobileView ? "90%" : "50%");
     };
 
     checkMobile();
@@ -101,7 +101,7 @@ export function App({ note }: ShareImageProps): JSXInternal.Element {
 
       if (dataUrl) {
         console.log("Image generated successfully");
-        
+
         // 如果选择直接下载，则触发下载
         if (downloadDirectly) {
           downloadImage(dataUrl);
@@ -134,9 +134,20 @@ export function App({ note }: ShareImageProps): JSXInternal.Element {
   };
 
   return (
-    <div className="w-full min-h-screen flex flex-col justify-start items-center p-2 md:p-5 ">
+    <div
+      className="w-full flex flex-col justify-start items-center p-2 md:p-5"
+      style={{
+        overflow: "auto",
+        height: "90vh",
+      }}
+    >
       {/* Template selector */}
-      <div className="w-full max-w-full mb-3 md:mb-4">
+      <div
+        className="w-full max-w-full mb-3 md:mb-4 overflow-x-auto "
+        style={{
+          minHeight: isMobile ? "120px" : "150px",
+        }}
+      >
         <TemplateSelect
           selectedTemplate={selectedTemplate}
           onSelectTemplate={setSelectedTemplate}
@@ -165,7 +176,7 @@ export function App({ note }: ShareImageProps): JSXInternal.Element {
           borderRadius: selectedTemplate.borderRadius || "15px",
           boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
           width: containerWidth,
-          minHeight: "200px"
+          height: "fit-content",
         }}
       >
         <ImageContent
