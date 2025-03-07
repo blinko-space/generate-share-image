@@ -26,5 +26,6 @@
   "systemDefaultFont": "System Default Font",
   "serifFont": "Serif Font",
   "monospaceFont": "Monospace Font",
-  "handwritingFont": "Handwriting Font"
+  "handwritingFont": "Handwriting Font",
+  "generateShareImage": "Generate Share Image"
 }

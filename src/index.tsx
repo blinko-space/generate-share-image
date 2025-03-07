@@ -43,12 +43,12 @@ System.register([], (exports) => ({
         // Add custom right-click menu item
         window.Blinko.addRightClickMenu({
           name: 'generate-share-image',
-          label: '生成分享图片',
+          label: window.Blinko.i18n.t("generateShareImage"),
           icon: 'tabler:share',
           onClick: (item: Note) => {
             console.log(JSON.parse(JSON.stringify(item)))
             window.Blinko.showDialog({
-              title: '生成分享图片',
+              title: window.Blinko.i18n.t("generateShareImage"),
               size: 'full',
               content: () => {
                 const container = document.createElement('div');

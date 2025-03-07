@@ -26,5 +26,6 @@
   "systemDefaultFont": "系统默认字体",
   "serifFont": "衬线字体 (Serif)",
   "monospaceFont": "等宽字体 (Monospace)",
-  "handwritingFont": "手写体 (Comic Sans)"
+  "handwritingFont": "手写体 (Comic Sans)",
+  "generateShareImage": "生成分享图片"
 }
