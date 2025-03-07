@@ -2,9 +2,10 @@
 /// <reference types="systemjs" />
 
 import { render } from 'preact/compat';
-import { App } from "./app"
+import { App } from "./app";
 import type { BasePlugin } from 'blinko';
 import { Setting } from './setting';
+import { Note, Tag } from 'blinko/dist/types/src/server/types';
 
 /**
  * Main plugin entry point registered with SystemJS
@@ -38,47 +39,31 @@ System.register([], (exports) => ({
       async init() {
         // Initialize internationalization
         this.initI18n();
-        
-        // Add toolbar icon with click handler
-        window.Blinko.addToolBarIcon({
-          name: "test",
-          icon: "<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-file'><path d='M13 3H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z'/><polyline points='14 3 14 9 19 9'/></svg>",
-          placement: 'top',
-          tooltip: 'testtootip',
-          content: () => {
-            const container = document.createElement('div');
-            container.setAttribute('data-plugin', 'my-note-plugin');
-            render(<App />, container);
-            return container;
-          }
-        });
 
         // Add custom right-click menu item
         window.Blinko.addRightClickMenu({
-          name: 'custom-action',
-          label: 'Custom Action',
-          icon: 'tabler:accessible',  
-          onClick: (item) => {
-            console.log('Custom action triggered', item)
+          name: 'generate-share-image',
+          label: '生成分享图片',
+          icon: 'tabler:share',
+          onClick: (item: Note) => {
+            window.Blinko.showDialog({
+              title: '生成分享图片',
+              size: 'full',
+              content: () => {
+                const container = document.createElement('div');
+                container.setAttribute('data-plugin', 'generate-share-image');
+                render(<App note={{
+                  title: item.title,
+                  content: item.content,
+                  createdAt: item.createdAt,
+                  tags: item.tags.map((t: Tag) => t.name)
+                }} />, container);
+                return container;
+              }
+            })
           }
         });
 
-        // Add AI write prompt for translation
-        window.Blinko.addAiWritePrompt(
-          'Translate Content',
-          'Please translate the following content into English:',
-          'material-symbols:translate'
-        );
-
-        // window.Blinko.showDialog({
-        //   title: 'Dialog',
-        //   content: () => {
-        //     const container = document.createElement('div');
-        //     container.setAttribute('data-plugin', 'my-note-plugin');
-        //     render(<App />, container);
-        //     return container;
-        //   }
-        // })
       }
 
       /**
