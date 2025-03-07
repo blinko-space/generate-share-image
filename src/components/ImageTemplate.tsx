@@ -90,19 +90,32 @@ export default function TemplateSelect({
   className = '',
   children
 }: TemplateSelectProps) {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  
+  // Check if device is mobile
+  useState(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  });
+  
   return (
     <div className={`${className}`}>
       <h3 className="text-sm font-medium text-gray-700 mb-3">选择模板样式</h3>
       
       {/* Template cards in centered, fixed layout */}
       <div className="flex justify-center mb-6">
-        <div className="flex gap-5 justify-center">
+        <div className={`flex ${isMobile ? 'flex-wrap justify-center gap-4' : 'gap-5 justify-center'}`}>
           {predefinedTemplates.map((template) => (
             <TemplateCard 
               key={template.id} 
               template={template} 
               isSelected={selectedTemplate.id === template.id}
               onClick={() => onSelectTemplate(template)}
+              isMobile={isMobile}
             />
           ))}
         </div>
@@ -117,11 +130,13 @@ export default function TemplateSelect({
 function TemplateCard({ 
   template, 
   isSelected, 
-  onClick 
+  onClick,
+  isMobile
 }: { 
   template: TemplateProps; 
   isSelected: boolean;
   onClick: () => void;
+  isMobile: boolean;
 }) {
   // Generate fixed widths for color blocks to ensure consistency
   const widths = {
@@ -141,14 +156,14 @@ function TemplateCard({
       <div 
         className="relative mb-2"
         style={{ 
-          width: '90px',
-          height: '90px',
+          width: isMobile ? '75px' : '90px',
+          height: isMobile ? '75px' : '90px',
           borderRadius: '10px',
           boxShadow: isSelected 
             ? `0 0 0 2px ${template.accentColor || '#3b82f6'}, 0 2px 8px rgba(0, 0, 0, 0.1)` 
             : '0 1px 3px rgba(0, 0, 0, 0.06)',
           backgroundColor: '#1f1f2e',
-          padding: '12px 10px'
+          padding: isMobile ? '8px 6px' : '12px 10px'
         }}
       >
         {/* Main background panel */}

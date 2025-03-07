@@ -11,8 +11,13 @@ import * as http from "http";
 // Get command line arguments
 const args = process.argv.slice(2);
 
+// Define the port to use
+const PORT = 9090; // Use a completely different port to avoid conflicts
+const wsPort = 9091; // WebSocket port - different from main port
+const httpPort = 9092; // HTTP server port - different from other ports
+
 const wss = new WebSocketServer({
-  port: 8080,
+  port: wsPort, // Using PORT for WebSocket
   // Add CORS headers in the upgrade process
   verifyClient: (info, cb) => {
     // Allow all origins
@@ -140,7 +145,7 @@ watch("./dist", { recursive: true }, (eventType, filename) => {
  * Creates a simple HTTP server to display connection instructions
  * @param {number} port - HTTP server port
  */
-const createHttpServer = (port: number = 3000) => {
+const createHttpServer = () => {
   const server = http.createServer((req, res) => {
     res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
     const html = `
@@ -217,17 +222,17 @@ const createHttpServer = (port: number = 3000) => {
             
             <p>Local Network Access:</p>
             <div class="code" onclick="copyToClipboard(this)">
-              ws://${getLocalIP()}:8080
+              ws://${getLocalIP()}:${wsPort}
             </div>
             
             <p>Local Access:</p>
             <div class="code" onclick="copyToClipboard(this)">
-              ws://localhost:8080
+              ws://localhost:${wsPort}
             </div>
 
             <p>External Access:</p>
             <div class="code" onclick="copyToClipboard(this)">
-              ws://\${window.location.hostname}:8080
+              ws://\${window.location.hostname}:${wsPort}
             </div>
           </div>
           <div class="container">
@@ -244,8 +249,8 @@ const createHttpServer = (port: number = 3000) => {
               if (externalUrlElement) {
                 const hostname = window.location.hostname;
                 // Handle CodeSandbox and other development domains
-                const wsHostname = hostname.replace(/-\d{4}\.preview\.csb\.app$/, '-8080.preview.csb.app')
-                                        .replace(/-3000\./, '-8080.');
+                const wsHostname = hostname.replace(/-\d{4}\.preview\.csb\.app$/, '-8082.preview.csb.app')
+                                        .replace(/-3000\./, '-8082.');
                 externalUrlElement.textContent = \`ws://\${wsHostname}\`;
               }
             });
@@ -284,13 +289,8 @@ const createHttpServer = (port: number = 3000) => {
     res.end(html);
   });
 
-  server.listen(port, () => {
-    console.log(
-      chalk.cyan(
-        `📝 Documentation server running at http://${getLocalIP()}:${port}`
-      )
-    );
-    console.log(chalk.cyan(`📝 Local access: http://localhost:${port}`));
+  server.listen(httpPort, () => {
+    console.log(chalk.green(`🌐 Connection guide available at http://localhost:${httpPort}`));
   });
 };
 
@@ -304,10 +304,10 @@ async function initServer() {
   createHttpServer();
 
   console.log(
-    chalk.cyan(`🎉 WebSocket server running at ws://${getLocalIP()}:8080`)
+    chalk.cyan(`🎉 WebSocket server running at ws://${getLocalIP()}:${wsPort}`)
   );
   console.log(
-    chalk.yellow("ℹ️  Open http://localhost:3000 for connection instructions")
+    chalk.yellow(`ℹ️  Open http://localhost:${httpPort} for connection instructions`)
   );
 }
 
