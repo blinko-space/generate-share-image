@@ -18,18 +18,20 @@ interface ShareImageProps {
     content: string;
     createdAt: string;
     tags: string[];
+    attachments?: Array<{
+      path: string;
+      type: string;
+    }>;
   };
 }
 
 export function App({ note }: ShareImageProps): JSXInternal.Element {
-  const [imageUrl, setImageUrl] = useState<string>("");
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateProps>(
     predefinedTemplates[0]
   );
   const [isGenerating, setIsGenerating] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [showCopyMessage, setShowCopyMessage] = useState(false);
   const [containerWidth, setContainerWidth] = useState("50%");
   const [showMarkdown, setShowMarkdown] = useState(false);
 
@@ -53,17 +55,17 @@ export function App({ note }: ShareImageProps): JSXInternal.Element {
 
   // Generate image on initial load
   useEffect(() => {
-    handleGenerateImage();
+    generateImage(false);
   }, []);
 
   // Generate image when template changes
   useEffect(() => {
     if (selectedTemplate) {
-      handleGenerateImage();
+      generateImage(false);
     }
   }, [selectedTemplate]);
 
-  const handleGenerateImage = async () => {
+  const generateImage = async (downloadDirectly: boolean = false) => {
     if (!containerRef.current || isGenerating) return;
 
     console.log("Starting image generation");
@@ -80,7 +82,7 @@ export function App({ note }: ShareImageProps): JSXInternal.Element {
 
       // 临时设置固定宽度以确保正确渲染
       container.style.position = "relative";
-      container.style.width = isMobile ? "95vw" : "95vw"; // 固定宽度
+      container.style.width = isMobile ? "90vw" : "50vw"; // 固定宽度
 
       // 等待DOM更新
       await new Promise((resolve) => setTimeout(resolve, 100));
@@ -94,12 +96,16 @@ export function App({ note }: ShareImageProps): JSXInternal.Element {
         backgroundColor: selectedTemplate.backgroundColor,
       });
 
-      container.style.position = 'absolute';
+      container.style.position = originalPosition;
       container.style.width = originalWidth;
 
       if (dataUrl) {
         console.log("Image generated successfully");
-        setImageUrl(dataUrl);
+        
+        // 如果选择直接下载，则触发下载
+        if (downloadDirectly) {
+          downloadImage(dataUrl);
+        }
       } else {
         throw new Error("Failed to generate image");
       }
@@ -115,43 +121,20 @@ export function App({ note }: ShareImageProps): JSXInternal.Element {
     }
   };
 
-  const handleCopyImage = async () => {
-    if (!imageUrl) return;
-
-    console.log("Copying image to clipboard");
-    try {
-      const success = await copyImageToClipboard(imageUrl);
-
-      if (success) {
-        console.log("Image copied successfully");
-        setShowCopyMessage(true);
-        setTimeout(() => setShowCopyMessage(false), 2000);
-      } else {
-        throw new Error("Failed to copy image");
-      }
-    } catch (error) {
-      console.error("复制图片失败:", error);
-      alert("复制图片失败，请重试");
-    }
+  const handleGenerateImage = () => {
+    generateImage(true); // 直接下载
   };
 
-  const handleDownload = () => {
-    if (!imageUrl) return;
-
-    console.log("Downloading image");
-    downloadImage(imageUrl);
-  };
-
-  const toggleMarkdown = () => {
+  const handleMarkdownDownload = () => {
     setShowMarkdown(!showMarkdown);
-    // Generate a new image after toggling markdown visibility
+    // 生成图片并直接下载
     if (!showMarkdown) {
-      setTimeout(() => handleGenerateImage(), 100);
+      setTimeout(() => generateImage(true), 100);
     }
   };
 
   return (
-    <div className="w-full min-h-screen flex flex-col justify-start items-center p-2 md:p-5 bg-background ">
+    <div className="w-full min-h-screen flex flex-col justify-start items-center p-2 md:p-5 ">
       {/* Template selector */}
       <div className="w-full max-w-full mb-3 md:mb-4">
         <TemplateSelect
@@ -164,55 +147,12 @@ export function App({ note }: ShareImageProps): JSXInternal.Element {
       <div className="w-full flex justify-center mb-4 gap-2">
         <button
           onClick={handleGenerateImage}
-          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg border-none text-sm font-medium flex items-center gap-2 transition-all duration-200 active:scale-[0.98]"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 py-2 px-4 rounded-lg border-none text-sm font-medium flex items-center gap-2 transition-all duration-200 active:scale-[0.98]"
           disabled={isGenerating}
         >
-          {isGenerating ? "生成中..." : "生成图片"}
-        </button>
-
-        <button
-          onClick={toggleMarkdown}
-          className="bg-slate-200 hover:bg-slate-300 text-slate-700 py-2 px-4 rounded-lg border-none text-sm font-medium flex items-center gap-2 transition-all duration-200 active:scale-[0.98]"
-        >
-          {showMarkdown ? "隐藏Markdown" : "显示Markdown"}
+          {isGenerating ? "生成中..." : "下载图片"}
         </button>
       </div>
-
-      {/* Image preview */}
-      {imageUrl && (
-        <div className="w-full flex flex-col items-center mb-3 md:mb-4">
-          <div className="relative" style={{ width: containerWidth }}>
-            <img
-              src={imageUrl}
-              alt="Share Image"
-              className="w-full h-auto rounded-xl shadow-md"
-            />
-
-            {/* Copy success message */}
-            {showCopyMessage && (
-              <div className="absolute top-2 md:top-4 right-2 md:right-4 bg-green-500 text-white px-2 md:px-3 py-1 md:py-2 rounded-md shadow-md text-xs md:text-sm animate-fade-in-out">
-                已复制到剪贴板
-              </div>
-            )}
-          </div>
-
-          {/* Image actions */}
-          <div className="flex gap-2 md:gap-3 mt-3 md:mt-4">
-            <button
-              onClick={handleCopyImage}
-              className="bg-primary hover:opacity-90 text-white py-1.5 md:py-2 px-3 md:px-4 rounded-lg border-none text-xs md:text-sm font-medium flex items-center gap-1 md:gap-2 transition-all duration-200 active:scale-[0.98]"
-            >
-              复制图片
-            </button>
-            <button
-              onClick={handleDownload}
-              className="bg-slate-200 hover:bg-slate-300 text-slate-700 py-1.5 md:py-2 px-3 md:px-4 rounded-lg border-none text-xs md:text-sm font-medium flex items-center gap-1 md:gap-2 transition-all duration-200 active:scale-[0.98]"
-            >
-              下载图片
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Content container */}
       <div
@@ -225,10 +165,7 @@ export function App({ note }: ShareImageProps): JSXInternal.Element {
           borderRadius: selectedTemplate.borderRadius || "15px",
           boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
           width: containerWidth,
-          minHeight: "200px",
-          position: "absolute",
-          zIndex: -9999,
-          scale: 0.1,
+          minHeight: "200px"
         }}
       >
         <ImageContent
@@ -236,6 +173,7 @@ export function App({ note }: ShareImageProps): JSXInternal.Element {
           createdAt={note?.createdAt || new Date().toISOString()}
           tags={note?.tags || []}
           template={selectedTemplate}
+          attachments={note?.attachments || []}
         />
       </div>
 

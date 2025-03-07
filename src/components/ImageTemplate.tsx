@@ -1,5 +1,5 @@
 import { ComponentChildren } from 'preact';
-import { useState } from 'preact/hooks';
+import { useState, useEffect } from 'preact/hooks';
 
 export interface TemplateProps {
   id: string;
@@ -93,22 +93,22 @@ export default function TemplateSelect({
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   
   // Check if device is mobile
-  useState(() => {
+  useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
     };
     
     window.addEventListener('resize', handleResize);
+    handleResize(); // Check on initial render
+    
     return () => window.removeEventListener('resize', handleResize);
-  });
+  }, []);
   
   return (
     <div className={`${className}`}>
-      <h3 className="text-sm font-medium text-gray-700 mb-3">选择模板样式</h3>
-      
       {/* Template cards in centered, fixed layout */}
-      <div className="flex justify-center mb-6">
-        <div className={`flex ${isMobile ? 'flex-wrap justify-center gap-4' : 'gap-5 justify-center'}`}>
+      <div className="flex justify-center mb-2 md:mb-4">
+        <div className={`flex ${isMobile ? 'flex-wrap justify-center gap-3' : 'flex-wrap lg:flex-nowrap gap-3 md:gap-5 justify-center'}`}>
           {predefinedTemplates.map((template) => (
             <TemplateCard 
               key={template.id} 
@@ -138,116 +138,156 @@ function TemplateCard({
   onClick: () => void;
   isMobile: boolean;
 }) {
-  // Generate fixed widths for color blocks to ensure consistency
-  const widths = {
-    bg: '100%',
-    tag: '90%',
-    text: '80%',
-    date: '70%',
-    accent: '85%'
-  };
+  // Determine sizes based on device
+  const cardSize = isMobile ? 68 : 90;
+  const headerHeight = isMobile ? 24 : 30;
   
   return (
     <div 
-      className={`flex flex-col items-center cursor-pointer transition-all duration-200 ${isSelected ? 'transform scale-105' : 'hover:scale-105'}`}
+      className={`flex flex-col items-center cursor-pointer transition-all duration-300 ease-in-out select-none ${isSelected ? 'transform scale-105' : 'hover:scale-105'}`}
       onClick={onClick}
+      style={{ marginBottom: isMobile ? '10px' : '12px' }}
     >
       {/* Modern color preview card */}
       <div 
-        className="relative mb-2"
+        className="relative mb-1 md:mb-2 overflow-hidden"
         style={{ 
-          width: isMobile ? '75px' : '90px',
-          height: isMobile ? '75px' : '90px',
-          borderRadius: '10px',
+          width: `${cardSize}px`,
+          height: `${cardSize}px`,
+          borderRadius: '12px',
           boxShadow: isSelected 
-            ? `0 0 0 2px ${template.accentColor || '#3b82f6'}, 0 2px 8px rgba(0, 0, 0, 0.1)` 
-            : '0 1px 3px rgba(0, 0, 0, 0.06)',
-          backgroundColor: '#1f1f2e',
-          padding: isMobile ? '8px 6px' : '12px 10px'
+            ? `0 0 0 2px ${template.accentColor || '#3b82f6'}, 0 4px 12px rgba(0, 0, 0, 0.15)` 
+            : '0 2px 6px rgba(0, 0, 0, 0.08)',
+          transition: 'all 0.3s ease-in-out',
+          transform: isSelected ? 'translateY(-2px)' : 'translateY(0)'
         }}
       >
-        {/* Main background panel */}
+        {/* Selected indicator */}
+        {isSelected && (
+          <div 
+            className="absolute top-2 right-2 z-10 rounded-full flex items-center justify-center"
+            style={{ 
+              width: '20px', 
+              height: '20px', 
+              backgroundColor: 'white',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+            }}
+          >
+            <svg 
+              width="12" 
+              height="12" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path 
+                d="M20 6L9 17L4 12" 
+                stroke={template.accentColor || '#3b82f6'} 
+                strokeWidth="3" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+        )}
+
+        {/* Card header / background preview */}
         <div 
-          className="w-full h-[28px] mb-3 rounded-md mx-auto"
+          className="w-full rounded-t-xl"
           style={{ 
             backgroundColor: template.backgroundColor,
+            height: `${headerHeight}px`,
+            borderBottom: `1px solid rgba(0,0,0,0.05)`
           }}
         />
         
-        {/* Color bars with fixed widths */}
-        <div className="flex flex-col gap-2">
-          {/* Tag color bar */}
-          <div className="flex items-center gap-1">
-            <div className="w-[6px] h-[6px] rounded-full bg-gray-400"></div>
+        {/* Card content area with lines */}
+        <div 
+          className="w-full h-full p-2"
+          style={{ 
+            backgroundColor: '#f8f9fa',
+          }}
+        >
+          {/* Text lines with corresponding colors */}
+          <div className="flex flex-col gap-1.5 mt-0.5">
+            {/* Title line */}
             <div 
-              className="h-2 rounded-sm"
-              style={{ 
-                backgroundColor: template.tagBackgroundColor,
-                width: widths.tag
-              }}
-            />
-          </div>
-          
-          {/* Text color bar */}
-          <div className="flex items-center gap-1">
-            <div className="w-[6px] h-[6px] rounded-full bg-gray-400"></div>
-            <div 
-              className="h-2 rounded-sm"
+              className="h-1.5 rounded-sm"
               style={{ 
                 backgroundColor: template.textColor,
-                width: widths.text
+                width: '90%',
+                opacity: 0.9
               }}
             />
-          </div>
-          
-          {/* Date color bar */}
-          <div className="flex items-center gap-1">
-            <div className="w-[6px] h-[6px] rounded-full bg-gray-400"></div>
+            
+            {/* Content lines */}
             <div 
-              className="h-2 rounded-sm"
+              className="h-1 rounded-sm"
+              style={{ 
+                backgroundColor: template.textColor,
+                width: '80%',
+                opacity: 0.7
+              }}
+            />
+            
+            <div 
+              className="h-1 rounded-sm"
+              style={{ 
+                backgroundColor: template.textColor,
+                width: '85%',
+                opacity: 0.7
+              }}
+            />
+            
+            {/* Tag pills */}
+            <div className="flex gap-1 mt-1">
+              <div 
+                className="h-1.5 rounded-full"
+                style={{ 
+                  backgroundColor: template.tagBackgroundColor,
+                  width: '24%'
+                }}
+              />
+              <div 
+                className="h-1.5 rounded-full"
+                style={{ 
+                  backgroundColor: template.tagBackgroundColor,
+                  width: '18%'
+                }}
+              />
+            </div>
+            
+            {/* Date */}
+            <div 
+              className="h-1 rounded-sm self-end mt-0.5"
               style={{ 
                 backgroundColor: template.dateColor,
-                width: widths.date
-              }}
-            />
-          </div>
-          
-          {/* Accent color bar */}
-          <div className="flex items-center gap-1">
-            <div className="w-[6px] h-[6px] rounded-full bg-gray-400"></div>
-            <div 
-              className="h-2 rounded-sm"
-              style={{ 
-                backgroundColor: template.accentColor || '#3b82f6',
-                width: widths.accent
+                width: '30%',
+                opacity: 0.8
               }}
             />
           </div>
         </div>
-        
-        {/* Selected indicator */}
-        {isSelected && (
-          <div className="absolute bottom-2 right-2 w-4 h-4 rounded-full bg-white flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="w-2.5 h-2.5" style={{ color: template.accentColor || '#3b82f6' }}>
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-          </div>
-        )}
       </div>
       
       {/* Template name */}
-      <div 
-        className={`text-center text-xs ${isSelected ? 'font-medium' : 'font-normal'}`}
-        style={{ color: isSelected ? template.accentColor || '#3b82f6' : '#4b5563' }}
+      <span 
+        className={`text-xs md:text-sm font-medium text-center transition-colors duration-200 px-1 py-0.5 rounded ${isSelected ? 'bg-gray-100 text-gray-800' : 'text-gray-600'}`}
+        style={{
+          maxWidth: `${cardSize}px`,
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis'
+        }}
       >
         {template.name}
-      </div>
+      </span>
     </div>
   );
 }
 
 // 自定义模板创建组件
-export function CustomTemplateCreator({
+function CustomTemplateCreator({
   baseTemplate,
   onSaveTemplate
 }: {
