@@ -22,8 +22,6 @@
     "@types/systemjs": "^6.15.1",
     "@types/ws": "^8.5.10",
     "dom-to-image": "^2.6.0",
-    "html-to-image": "^1.11.13",
-    "html2canvas": "^1.4.1",
     "preact": "^10.26.0",
     "preact-iso": "^2.9.0",
     "preact-markdown": "^2.1.0",
