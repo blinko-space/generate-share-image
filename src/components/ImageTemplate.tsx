@@ -313,7 +313,6 @@ function TemplateCard({
   );
 }
 
-// 自定义模板创建组件
 function CustomTemplateCreator({
   baseTemplate,
   onSaveTemplate,
@@ -323,7 +322,7 @@ function CustomTemplateCreator({
 }) {
   const [template, setTemplate] = useState<TemplateProps>({
     ...baseTemplate,
-    name: "自定义模板",
+    name: window.Blinko.i18n.t("customTemplate"),
     id: "custom-" + Date.now(),
   });
 
@@ -333,12 +332,12 @@ function CustomTemplateCreator({
 
   return (
     <div className="space-y-4 p-4 border border-gray-200 rounded-lg mt-4">
-      <h3 className="text-lg font-medium">创建自定义模板</h3>
+      <h3 className="text-lg font-medium">{window.Blinko.i18n.t("createCustomTemplate")}</h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            模板名称
+            {window.Blinko.i18n.t("templateName")}
           </label>
           <input
             type="text"
@@ -352,7 +351,7 @@ function CustomTemplateCreator({
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            背景颜色
+            {window.Blinko.i18n.t("backgroundColor")}
           </label>
           <div className="flex mt-1">
             <input
@@ -382,7 +381,7 @@ function CustomTemplateCreator({
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            文本颜色
+            {window.Blinko.i18n.t("textColor")}
           </label>
           <div className="flex mt-1">
             <input
@@ -406,7 +405,7 @@ function CustomTemplateCreator({
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            日期颜色
+            {window.Blinko.i18n.t("dateColor")}
           </label>
           <div className="flex mt-1">
             <input
@@ -430,7 +429,7 @@ function CustomTemplateCreator({
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            标签背景颜色
+            {window.Blinko.i18n.t("tagBackgroundColor")}
           </label>
           <div className="flex mt-1">
             <input
@@ -460,7 +459,7 @@ function CustomTemplateCreator({
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            标签文本颜色
+            {window.Blinko.i18n.t("tagTextColor")}
           </label>
           <div className="flex mt-1">
             <input
@@ -490,7 +489,7 @@ function CustomTemplateCreator({
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            强调色
+            {window.Blinko.i18n.t("accentColor")}
           </label>
           <div className="flex mt-1">
             <input
@@ -520,7 +519,7 @@ function CustomTemplateCreator({
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            字体
+            {window.Blinko.i18n.t("font")}
           </label>
           <select
             value={template.fontFamily}
@@ -530,23 +529,23 @@ function CustomTemplateCreator({
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
           >
             <option value="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
-              系统默认字体
+              {window.Blinko.i18n.t("systemDefaultFont")}
             </option>
             <option value="Georgia, Cambria, 'Times New Roman', Times, serif">
-              衬线字体 (Serif)
+              {window.Blinko.i18n.t("serifFont")}
             </option>
             <option value="'Courier New', Courier, monospace">
-              等宽字体 (Monospace)
+              {window.Blinko.i18n.t("monospaceFont")}
             </option>
             <option value="'Comic Sans MS', cursive, sans-serif">
-              手写体 (Comic Sans)
+              {window.Blinko.i18n.t("handwritingFont")}
             </option>
           </select>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            圆角大小
+            {window.Blinko.i18n.t("borderRadius")}
           </label>
           <input
             type="text"
@@ -565,7 +564,7 @@ function CustomTemplateCreator({
           className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           onClick={() => onSaveTemplate(template)}
         >
-          保存模板
+          {window.Blinko.i18n.t("saveTemplate")}
         </button>
       </div>
     </div>

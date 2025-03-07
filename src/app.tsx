@@ -73,21 +73,16 @@ export function App({ note }: ShareImageProps): JSXInternal.Element {
     setErrorMessage(null);
 
     try {
-      // 确保容器有正确的尺寸
       const container = containerRef.current;
 
-      // 记录原始样式
       const originalPosition = container.style.position;
       const originalWidth = container.style.width;
 
-      // 临时设置固定宽度以确保正确渲染
       container.style.position = "relative";
-      container.style.width = isMobile ? "90vw" : "50vw"; // 固定宽度
+      container.style.width = isMobile ? "90vw" : "50vw"; 
 
-      // 等待DOM更新
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      // 生成图片
       const dataUrl = await generateImageFromHtml(container, {
         setErrorMessage: (msg) => {
           console.log("Error message:", msg);
@@ -102,7 +97,6 @@ export function App({ note }: ShareImageProps): JSXInternal.Element {
       if (dataUrl) {
         console.log("Image generated successfully");
 
-        // 如果选择直接下载，则触发下载
         if (downloadDirectly) {
           downloadImage(dataUrl);
         }
@@ -112,7 +106,7 @@ export function App({ note }: ShareImageProps): JSXInternal.Element {
     } catch (err) {
       console.error("Error generating image:", err);
       setErrorMessage(
-        `生成图片时发生错误: ${
+        `${window.Blinko.i18n.t("errorGenerating")}${
           err instanceof Error ? err.message : String(err)
         }`
       );
@@ -127,7 +121,6 @@ export function App({ note }: ShareImageProps): JSXInternal.Element {
 
   const handleMarkdownDownload = () => {
     setShowMarkdown(!showMarkdown);
-    // 生成图片并直接下载
     if (!showMarkdown) {
       setTimeout(() => generateImage(true), 100);
     }
@@ -161,7 +154,9 @@ export function App({ note }: ShareImageProps): JSXInternal.Element {
           className="bg-primary text-primary-foreground hover:bg-primary/90 py-2 px-4 rounded-lg border-none text-sm font-medium flex items-center gap-2 transition-all duration-200 active:scale-[0.98]"
           disabled={isGenerating}
         >
-          {isGenerating ? "生成中..." : "下载图片"}
+          {isGenerating
+            ? window.Blinko.i18n.t("generatingImage")
+            : window.Blinko.i18n.t("downLoadImage")}
         </button>
       </div>
 
@@ -201,7 +196,7 @@ export function App({ note }: ShareImageProps): JSXInternal.Element {
           <div className="bg-white p-4 md:p-5 rounded-lg shadow-lg flex flex-col items-center">
             <div className="w-6 h-6 md:w-8 md:h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mb-2 md:mb-3"></div>
             <p className="text-gray-800 text-sm md:text-base">
-              正在生成图片...
+              {window.Blinko.i18n.t("generating")}
             </p>
           </div>
         </div>
