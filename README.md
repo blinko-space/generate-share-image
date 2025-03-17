@@ -69,6 +69,11 @@ Configure your plugin in `plugin.json`:
 }
 ```
 
+## Merge from Blinko plugin template
+```bash
+git pull https://github.com/blinko-space/blinko-plugin-template.git main
+```
+
 ## 📝 License
 
 MIT
