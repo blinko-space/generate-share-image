@@ -6,7 +6,9 @@ import { App } from "./app";
 import type { BasePlugin } from 'blinko';
 import { Setting } from './setting';
 import { Note, Tag } from 'blinko/dist/types/src/server/types';
-
+import en from './locales/en.json';
+import zh from './locales/zh.json';
+import pluginJSON from '../plugin.json';
 /**
  * Main plugin entry point registered with SystemJS
  * Exports the plugin class implementing BasePlugin interface
@@ -16,7 +18,7 @@ System.register([], (exports) => ({
     exports('default', class Plugin implements BasePlugin {
       constructor() {
         // Initialize plugin with metadata from plugin.json
-        Object.assign(this, __PLUGIN_JSON__);
+        Object.assign(this, pluginJSON);
       }
 
       // Flag indicating this plugin has a settings panel
@@ -76,8 +78,8 @@ System.register([], (exports) => ({
        * Adds English and Chinese translation bundles
        */
       initI18n() {
-        window.Blinko.i18n.addResourceBundle('en', 'translation', __en__);
-        window.Blinko.i18n.addResourceBundle('zh', 'translation', __zh__);
+        window.Blinko.i18n.addResourceBundle('en', 'translation', en);
+        window.Blinko.i18n.addResourceBundle('zh', 'translation', zh);
       }
 
       /**
